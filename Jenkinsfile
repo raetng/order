@@ -14,6 +14,7 @@ pipeline {
     environment {
         DOCKER_IMAGE       = 'raetng/order'
         DOCKER_CREDENTIALS = 'dockerhub-credentials'
+        PATH               = "/Users/raetng/.nvm/versions/node/v24.11.0/bin:/usr/local/bin:${env.PATH}"
     }
 
     stages {
