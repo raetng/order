@@ -33,7 +33,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'npm ci'
-                sh 'npm run lint'
+                sh 'npm run lint --if-present'
                 // TODO: Add any additional build/compile steps if needed
             }
         }
