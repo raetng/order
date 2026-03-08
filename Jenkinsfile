@@ -153,6 +153,9 @@ def resolveImageTag() {
         def version = readFile('VERSION').trim()
         return "v${version}"
     } else if (branch.startsWith('release/')) {
+        // Auto-write VERSION from branch name (e.g., release/1.1.0 → 1.1.0)
+        def version = branch.replaceFirst(/^release\//, '')
+        writeFile file: 'VERSION', text: version
         return "rc-${env.GIT_COMMIT_SHORT}"
     } else if (env.CHANGE_ID) {
         return "pr-${env.CHANGE_ID}-${env.GIT_COMMIT_SHORT}"
