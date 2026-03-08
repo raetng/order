@@ -19,6 +19,9 @@ RUN npm ci --omit=dev
 FROM node:20-alpine AS final
 WORKDIR /app
 
+# Patch Alpine OS-level vulnerabilities
+RUN apk update && apk upgrade --no-cache
+
 # Run as non-root user
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
