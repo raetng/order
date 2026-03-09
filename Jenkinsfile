@@ -50,6 +50,27 @@ pipeline {
             }
         }
 
+        stage('IaC Security Scan') {
+            when {
+                anyOf {
+                    branch 'develop'
+                    branch pattern: 'release/*', comparator: 'GLOB'
+                    branch 'main'
+                }
+            }
+            steps {
+                script {
+                    def threshold = (env.DEPLOY_NAMESPACE == 'staging' || env.DEPLOY_NAMESPACE == 'prod') ? 'HIGH' : 'CRITICAL'
+                    def tfvars = [dev: 'dev.tfvars', staging: 'staging.tfvars', prod: 'prod.tfvars']
+                    iacSecurityScan(
+                        terraformDir: 'infrastructure/terraform',
+                        severityThreshold: threshold,
+                        tfvarsFile: tfvars[env.DEPLOY_NAMESPACE] ?: ''
+                    )
+                }
+            }
+        }
+
         stage('Container Build') {
             steps {
                 script {
@@ -133,7 +154,7 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: '**/trivy-report-*.json,**/trivy-report-*.txt,**/gitleaks-report.json,**/test-results/**', allowEmptyArchive: true
+            archiveArtifacts artifacts: '**/trivy-report-*.json,**/trivy-report-*.txt,**/gitleaks-report.json,**/tfsec-report*.json,**/tfsec-report*.txt,**/test-results/**', allowEmptyArchive: true
             cleanWs()
         }
         failure {
